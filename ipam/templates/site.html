@@ -1,0 +1,48 @@
+{# ===== site.html ===== #}
+{# Consultation décentralisée : clients rattachés à un site (routeur PE) donné. #}
+{% extends "base.html" %}
+{% block page_title %}Site {{ routeur_pe }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-title">Clients — {{ routeur_pe }}</div>
+    <div class="page-desc">{{ clients|length }} client{% if clients|length > 1 %}s{% endif %} rattaché{% if clients|length > 1 %}s{% endif %} à ce routeur</div>
+</div>
+
+<div style="display:flex;gap:8px;margin-bottom:20px">
+    {% for r in routeurs %}
+    <a href="/site/{{ r }}" class="btn {% if r==routeur_pe %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">{{ r }}{% if r=='PE3' %} — Groupe 3{% endif %}</a>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Clients sur {{ routeur_pe }}</div>
+    </div>
+    <div class="table-wrap">
+        {% if clients %}
+        <table>
+            <thead><tr><th>ID</th><th>Nom</th><th>VLAN</th><th>VRF</th><th>Sous-réseau</th><th>Passerelle</th><th>RD</th><th></th></tr></thead>
+            <tbody>
+                {% for c in clients %}
+                <tr>
+                    <td><span class="mono" style="color:var(--text3)">#{{ c.id }}</span></td>
+                    <td><span style="font-weight:600">{{ c.nom }}</span></td>
+                    <td><span class="badge badge-blue">{{ c.vlan }}</span></td>
+                    <td><span class="mono" style="font-size:11px;color:var(--text2)">{{ c.vrf }}</span></td>
+                    <td><span class="mono">{{ c.sous_reseau }}/28</span></td>
+                    <td><span class="mono" style="color:var(--green)">{{ c.passerelle }}</span></td>
+                    <td><span class="mono" style="font-size:11px;color:var(--text3)">65556:{{ c.vlan }}</span></td>
+                    <td><a href="/client/{{ c.id }}" class="btn btn-secondary btn-sm">Config</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">
+            <div class="empty-title">Aucun client sur {{ routeur_pe }}</div>
+            <div class="empty-sub">Les clients ajoutés sur ce routeur apparaîtront ici</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

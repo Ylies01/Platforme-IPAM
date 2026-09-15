@@ -1,0 +1,97 @@
+{# ===== index.html ===== #}
+{# Page d'accueil : liste de tous les clients (table + lien vers le détail et bouton supprimer). #}
+{% extends "base.html" %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block content %}
+
+{% set nb = clients|length %}
+{% set pct = ((nb / 16) * 100)|int %}
+
+<div class="page-header">
+    <div class="page-title">Clients enregistrés</div>
+    <div class="page-desc">Gestion des sous-réseaux — plage 164.166.3.0/24</div>
+</div>
+
+<div class="stats-row">
+    <div class="stat">
+        <div class="stat-label">Clients actifs</div>
+        <div class="stat-value">{{ nb }}</div>
+        <div class="stat-sub">sur 16 maximum</div>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ pct }}%"></div></div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Sous-réseaux libres</div>
+        <div class="stat-value">{{ 16 - nb }}</div>
+        <div class="stat-sub">blocs /28 disponibles</div>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ 100 - pct }}%; background:#059669"></div></div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Taux d'occupation</div>
+        <div class="stat-value">{{ pct }}%</div>
+        <div class="stat-sub">164.166.3.0/24</div>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ pct }}%; background:{% if pct > 80 %}#dc2626{% elif pct > 50 %}#d97706{% else %}#2563eb{% endif %}"></div></div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">AS Number</div>
+        <div class="stat-value" style="font-size:22px">65556</div>
+        <div class="stat-sub">Route distinguisher</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <div class="card-title">Liste des clients</div>
+            <div class="card-desc">{{ nb }} client{% if nb > 1 %}s{% endif %} — VLAN et sous-réseau attribués automatiquement</div>
+        </div>
+        <a href="/ajouter" class="btn btn-primary btn-sm">+ Nouveau client</a>
+    </div>
+    <div class="table-wrap">
+        {% if clients %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>VLAN</th>
+                    <th>Sous-réseau</th>
+                    <th>Passerelle</th>
+                    <th>VRF</th>
+                    <th>Routeur</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clients %}
+                <tr>
+                    <td><span class="mono" style="color:var(--text3)">#{{ c.id }}</span></td>
+                    <td><span style="font-weight:600">{{ c.nom }}</span></td>
+                    <td><span class="badge badge-blue">{{ c.vlan }}</span></td>
+                    <td><span class="mono">{{ c.sous_reseau }}/28</span></td>
+                    <td><span class="mono" style="color:var(--green)">{{ c.passerelle }}</span></td>
+                    <td><span class="mono" style="color:var(--text2); font-size:11px">{{ c.vrf }}</span></td>
+                    <td><span class="badge badge-gray">{{ c.routeur_pe }}</span></td>
+                    <td><span style="color:var(--text3); font-size:12px">{{ c.date_creation[:10] if c.date_creation else '—' }}</span></td>
+                    <td>
+                        <div style="display:flex;gap:6px;justify-content:flex-end">
+                            <a href="/client/{{ c.id }}" class="btn btn-secondary btn-sm">Config</a>
+                            <form method="POST" action="/supprimer/{{ c.id }}" onsubmit="return confirm('Supprimer {{ c.nom }} ?')">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">
+            <div class="empty-title">Aucun client enregistré</div>
+            <div class="empty-sub">Ajoutez votre premier client pour commencer</div>
+            <a href="/ajouter" class="btn btn-primary">+ Nouveau client</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

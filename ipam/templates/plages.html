@@ -1,0 +1,41 @@
+{# ===== plages.html ===== #}
+{# Visualisation de l'état des 16 sous-réseaux /28 (libre / réservée / allouée). #}
+{% extends "base.html" %}
+{% block page_title %}Plages IP{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-title">Plages d'adresses</div>
+    <div class="page-desc">164.166.3.0/24 — 16 blocs /28 (14 adresses utilisables par bloc)</div>
+</div>
+
+{% set libres = namespace(n=0) %}{% set allouees = namespace(n=0) %}
+{% for p in plages %}{% if p.etat=='libre' %}{% set libres.n = libres.n+1 %}{% endif %}{% if p.etat=='allouee' %}{% set allouees.n = allouees.n+1 %}{% endif %}{% endfor %}
+
+<div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="stat"><div class="stat-label">Libres</div><div class="stat-value" style="color:var(--green)">{{ libres.n }}</div></div>
+    <div class="stat"><div class="stat-label">Alloués</div><div class="stat-value" style="color:var(--red)">{{ allouees.n }}</div></div>
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-value">16</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><div class="card-title">Tous les blocs /28</div></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>#</th><th>Réseau</th><th>Première IP</th><th>Dernière IP</th><th>Broadcast</th><th>État</th></tr></thead>
+            <tbody>
+                {% for p in plages %}
+                {% set parts = p.reseau.split('.') %}{% set b = parts[3]|int %}{% set pfx = parts[0]~'.'~parts[1]~'.'~parts[2]~'.' %}
+                <tr>
+                    <td><span class="mono" style="color:var(--text3)">{{ p.id }}</span></td>
+                    <td><span class="mono" style="font-weight:500">{{ p.reseau }}/28</span></td>
+                    <td><span class="mono" style="color:var(--green)">{{ pfx }}{{ b+1 }}</span></td>
+                    <td><span class="mono" style="color:var(--text2)">{{ pfx }}{{ b+14 }}</span></td>
+                    <td><span class="mono" style="color:var(--text3)">{{ pfx }}{{ b+15 }}</span></td>
+                    <td>{% if p.etat=='libre' %}<span class="badge badge-green"><span class="badge-dot"></span>Libre</span>{% elif p.etat=='allouee' %}<span class="badge badge-red"><span class="badge-dot"></span>Allouée</span>{% else %}<span class="badge badge-amber"><span class="badge-dot"></span>Réservée</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

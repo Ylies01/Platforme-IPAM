@@ -1,0 +1,41 @@
+{# ===== config.html ===== #}
+{# Affiche le détail d'un client et la configuration Cisco générée automatiquement. #}
+{% extends "base.html" %}
+{% block page_title %}{{ client.nom }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="page-title">{{ client.nom }}</div>
+        <span class="badge badge-green"><span class="badge-dot"></span>Actif</span>
+        <span class="badge badge-blue">VLAN {{ client.vlan }}</span>
+        <span class="badge badge-gray">{{ client.routeur_pe }}</span>
+    </div>
+    <div class="page-desc">Configuration réseau générée automatiquement</div>
+</div>
+
+<div class="info-grid">
+    <div class="info-item"><div class="info-label">Client ID</div><div class="info-value">#{{ client.id }}</div></div>
+    <div class="info-item"><div class="info-label">VLAN</div><div class="info-value">{{ client.vlan }}</div></div>
+    <div class="info-item"><div class="info-label">Sous-réseau</div><div class="info-value">{{ client.sous_reseau }}/28</div></div>
+    <div class="info-item"><div class="info-label">Passerelle</div><div class="info-value" style="color:var(--green)">{{ client.passerelle }}</div></div>
+    <div class="info-item"><div class="info-label">Masque</div><div class="info-value">255.255.255.240</div></div>
+    <div class="info-item"><div class="info-label">VRF</div><div class="info-value">{{ client.vrf }}</div></div>
+    <div class="info-item"><div class="info-label">Route Distinguisher</div><div class="info-value">65556:{{ client.vlan }}</div></div>
+    <div class="info-item"><div class="info-label">Routeur PE</div><div class="info-value">{{ client.routeur_pe }}</div></div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <div class="card-title">Configuration Cisco IOS</div>
+            <div class="card-desc">À coller sur le routeur {{ client.routeur_pe }}</div>
+        </div>
+    </div>
+    <pre>{{ configuration }}</pre>
+</div>
+
+<div style="display:flex;gap:10px">
+    <a href="/" class="btn btn-secondary">← Retour</a>
+    <a href="/ajouter" class="btn btn-primary">+ Nouveau client</a>
+</div>
+{% endblock %}
